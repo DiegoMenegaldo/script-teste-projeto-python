@@ -15,6 +15,7 @@ dadosDISCO = psutil.disk_usage('/').percent
 header = ['Data e Hora', 'CPU', 'RAM', 'DISCO']
 dadosCapturados = [dataAtual, dadosCPU, dadosRAM, dadosDISCO]
 
+print("Escrito por: Diego Menegaldo")
 with open('arquivo-teste.csv', 'a', newline='') as arquivo:
         escrever = csv.writer(arquivo)
         if not verificarArquivo:
