@@ -1,64 +1,56 @@
 import csv
 
-while True:
-        escolha = int(input("""Digite o que deseja visualizar:
-1 - Visualizar todos os dados do CSV sem tratamento
-2 - Visualizar relatório de monitoramento
-0 - Sair
-Escolha: """))
+somaCpu = somaRam = somaDisco = 0
+cpuMax = ramMax = discoMax = 0
+contador = 0
 
-        if escolha == 0:
-            print("Encerrando programa...")
-            break
+with open('arquivo-teste.csv', 'r') as arquivo:
+    leitor = csv.DictReader(arquivo)
 
-        if escolha not in (1, 2):
-            print("Opção inválida.\n")
-            continue
+    for linha in leitor:
+        cpu = float(linha['CPU'])
+        ram = float(linha['RAM'])
+        disco = float(linha['DISCO'])
 
-        with open('arquivo-teste.csv', 'r') as arquivo:
-            leitor = csv.DictReader(arquivo)
+        somaCpu += cpu
+        somaRam += ram
+        somaDisco += disco
 
-            if escolha == 1:
-                print("\nDados sem tratamento:\n")
-                for linha in leitor:
-                    print(linha)
-            elif escolha == 2:
-                somaCpu = 0 
-                somaRam = 0
-                somaDisco = 0
-                cpuMax = 0
-                ramMax = 0
-                discoMax = 0
-                contador = 0
+        if cpu > cpuMax:
+            cpuMax = cpu
+        if ram > ramMax:
+            ramMax = ram
+        if disco > discoMax:
+            discoMax = disco
 
-                for linha in leitor:
-                    cpu = float(linha['CPU'])
-                    ram = float(linha['RAM'])
-                    disco = float(linha['DISCO'])
+        contador += 1
 
-                    somaCpu += cpu
-                    somaRam += ram
-                    somaDisco += disco
+if contador > 0:
+    media_cpu = somaCpu / contador
+    media_ram = somaRam / contador
+    media_disco = somaDisco / contador
 
-                    if cpu > cpuMax:
-                        cpuMax = cpu
-                    if ram > ramMax:
-                        ramMax = ram
-                    if disco > discoMax:
-                        discoMax = disco
+    with open('relatorio-tratado.csv', 'w', newline='') as arquivoTratado:
+        escrever = csv.writer(arquivoTratado)
 
-                    contador += 1
+        escrever.writerow([
+            'Media CPU (%)',
+            'Pico CPU (%)',
+            'Media RAM (%)',
+            'Pico RAM (%)',
+            'Media DISCO (%)',
+            'Pico DISCO (%)'
+        ])
 
-                if contador > 0:
-                    media_cpu = somaCpu / contador
-                    media_ram = somaRam / contador
-                    media_disco = somaDisco / contador
-                    print("\n Relatório com dados tratados \n")
-                    print(f"Média CPU: {media_cpu:.2f}%")
-                    print(f"Pico CPU: {cpuMax:.2f}%\n")
-                    print(f"Média RAM: {media_ram:.2f}%")
-                    print(f"Pico RAM: {ramMax:.2f}%\n")
-                    print(f"Média DISCO: {media_disco:.2f}%")
-                    print(f"Pico DISCO: {discoMax:.2f}%")
-                else:
-                    print("Nenhum dado encontrado no arquivo.")
+        escrever.writerow([
+            f"{media_cpu:.2f}",
+            f"{cpuMax:.2f}",
+            f"{media_ram:.2f}",
+            f"{ramMax:.2f}",
+            f"{media_disco:.2f}",
+            f"{discoMax:.2f}"
+        ])
+
+    print("Arquivo relatorio-tratado.csv criado com sucesso!")
+else:
+    print("Nenhum dado encontrado no arquivo original.")
